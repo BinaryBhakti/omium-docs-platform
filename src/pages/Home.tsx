@@ -21,16 +21,14 @@ const categories = [
     desc: "Install the SDK and run your first Omium workflow in under five minutes.",
     to: "/docs/get-started",
     icon: Rocket,
-    pages: ["Quickstart", "Installation", "Your first run"],
-    accent: "var(--color-accent-pink)",
+    pages: ["Quickstart", "Installation", "First run"],
   },
   {
     title: "SDK",
     desc: "Python and CLI references with examples for every primitive.",
     to: "/docs/sdk",
     icon: Terminal,
-    pages: ["Python SDK", "CLI", "Authentication", "Examples"],
-    accent: "var(--color-accent-orange)",
+    pages: ["Python", "CLI", "Auth", "Examples"],
   },
   {
     title: "API reference",
@@ -38,15 +36,13 @@ const categories = [
     to: "/docs/api-reference",
     icon: Network,
     pages: ["Runs", "Checkpoints", "Traces", "Policies"],
-    accent: "var(--color-accent-yellow)",
   },
   {
     title: "Platform concepts",
     desc: "How workflows, checkpointing, recovery, and routing fit together.",
     to: "/docs/concepts",
     icon: Layers,
-    pages: ["Workflows", "Checkpointing", "Recovery", "Tracing", "Policy"],
-    accent: "var(--color-accent-pink)",
+    pages: ["Workflows", "Recovery", "Tracing", "Routing"],
   },
 ];
 
@@ -91,316 +87,286 @@ const recentDocs = [
 
 const changelog = [
   { date: "May 8, 2026", title: "Trace API v1.2", detail: "Added span-level token usage and cost attribution." },
-  { date: "Apr 30, 2026", title: "Checkpoint compaction", detail: "Older checkpoints are now compacted into 24h windows by default." },
+  { date: "Apr 30, 2026", title: "Checkpoint compaction", detail: "Older checkpoints are compacted into 24h windows by default." },
   { date: "Apr 22, 2026", title: "Python SDK 0.9", detail: "New omium.run.watch() helper and improved retry semantics." },
 ];
 
 export function Home() {
   return (
-    <div className="px-5 md:px-10 py-10 max-w-[1240px] mx-auto w-full">
-      {/* Hero strip */}
-      <section className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 lg:gap-10 items-start">
-        <div>
-          <div className="inline-flex items-center gap-1.5 h-6 pl-1.5 pr-2 rounded-full border border-border-subtle bg-surface text-[11.5px] text-text-secondary">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent-orange" />
-            Omium Platform · v1
-            <span className="text-text-muted">— stable</span>
-          </div>
-          <h1 className="mt-3 text-[34px] sm:text-[40px] leading-[1.08] tracking-[-0.025em] font-semibold text-text">
-            Build reliable AI workflows
-            <span className="block text-text-muted font-medium tracking-[-0.02em]">
-              with the Omium platform.
-            </span>
-          </h1>
-          <p className="mt-3 max-w-[600px] text-[15.5px] leading-[24px] text-text-secondary">
-            Documentation for the Omium SDK, REST API, and platform primitives —
-            workflows, checkpointing, tracing, policy enforcement, and LLM routing.
-          </p>
+    <div className="relative">
+      {/* Soft copper glow at the top */}
+      <div
+        className="pointer-events-none absolute top-0 inset-x-0 h-[500px] opacity-50"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 50% at 30% 0%, rgba(222,146,79,0.10), transparent 70%)",
+        }}
+        aria-hidden
+      />
+      <div className="absolute inset-0 bg-grid opacity-30 pointer-events-none [mask-image:linear-gradient(to_bottom,black_0%,transparent_60%)]" aria-hidden />
 
-          <div className="mt-5 flex flex-wrap gap-2">
-            <Link
-              to="/docs/get-started"
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md bg-text text-bg text-[13px] font-medium hover:opacity-90"
-            >
-              <Rocket size={13} />
-              Start the quickstart
-            </Link>
-            <Link
-              to="/docs/api-reference"
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-border-subtle bg-surface text-text text-[13px] font-medium hover:border-border-strong"
-            >
-              <Network size={13} />
-              API reference
-            </Link>
-            <Link
-              to="/docs/sdk"
-              className="inline-flex items-center gap-1.5 h-9 px-3 rounded-md text-text-secondary text-[13px] font-medium hover:text-text hover:bg-[color:var(--color-hover)]"
-            >
-              <Terminal size={13} />
-              SDK
-            </Link>
-          </div>
-        </div>
-
-        {/* Quickstart code card on the right */}
-        <div className="rounded-xl border border-border-subtle overflow-hidden"
-          style={{ background: "var(--code-bg)" }}>
-          <div className="flex items-center justify-between h-9 px-3 border-b border-[color:var(--code-border)]"
-            style={{ background: "var(--code-surface)" }}>
-            <div className="flex items-center gap-2 text-[color:var(--code-muted)]">
-              <div className="flex gap-1">
-                <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
-                <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
-                <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
-              </div>
-              <span className="font-mono text-[11px] uppercase tracking-wide">terminal</span>
+      <div className="relative px-5 md:px-10 py-12 max-w-[1240px] mx-auto w-full">
+        {/* Hero */}
+        <section className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-8 lg:gap-12 items-start">
+          <div>
+            <div className="inline-flex items-center gap-2 h-7 pl-2.5 pr-3 rounded-full border border-copper/30 bg-copper/[0.06] text-[10.5px] uppercase tracking-[0.2em] font-medium text-copper">
+              <span className="h-1.5 w-1.5 rounded-full bg-copper shadow-[0_0_8px_rgba(222,146,79,0.7)]" />
+              v1 · Stable
             </div>
-            <span className="text-[11px] text-[color:var(--code-muted)] font-mono">~/omium</span>
-          </div>
-          <pre className="px-4 py-3 text-[13px] leading-[22px] font-mono" style={{ color: "var(--code-text)" }}>
-{`$ pip install omium
-$ export OMIUM_API_KEY="omk_..."
-$ omium run hello.py::summarize_workflow \\
-    --arg text="Omium is a workflow platform."
+            <h1 className="mt-5 text-[44px] sm:text-[56px] leading-[1.02] tracking-[-0.04em] font-extrabold text-white">
+              Build reliable AI workflows.
+              <span className="block text-white/40 font-semibold">
+                Documentation for the Omium platform.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-[600px] text-[16px] leading-[26px] text-white/60">
+              The Omium SDK, REST API, and platform primitives — workflows,
+              checkpointing, tracing, policy enforcement, and LLM routing — all
+              in one place.
+            </p>
 
-`}
-            <span className="tok-comment">→ run_01H8XK… ✓ summarize · 412ms · $0.0004</span>
-          </pre>
-        </div>
-      </section>
-
-      {/* Category grid */}
-      <section className="mt-12">
-        <SectionHeader
-          eyebrow="Browse the docs"
-          title="Pick a path"
-          right={
-            <Link
-              to="/docs/concepts"
-              className="text-[12.5px] text-text-secondary hover:text-text inline-flex items-center gap-1"
-            >
-              All concepts <ArrowUpRight size={12} />
-            </Link>
-          }
-        />
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {categories.map((cat) => (
-            <Link
-              key={cat.title}
-              to={cat.to}
-              className="group relative overflow-hidden rounded-lg border border-border-subtle bg-surface p-4 hover:border-border-strong transition-colors"
-            >
-              <div
-                className="absolute -top-10 -right-10 h-28 w-28 rounded-full opacity-50 group-hover:opacity-80 transition-opacity"
-                style={{
-                  background: `radial-gradient(closest-side, ${cat.accent}, transparent 70%)`,
-                }}
-                aria-hidden
-              />
-              <div className="relative">
-                <div className="flex items-center gap-2">
-                  <div className="h-8 w-8 rounded-md border border-border-subtle bg-bg flex items-center justify-center">
-                    <cat.icon size={14} className="text-text" />
-                  </div>
-                  <span className="text-[14.5px] font-semibold text-text tracking-[-0.005em]">
-                    {cat.title}
-                  </span>
-                  <ArrowUpRight
-                    size={13}
-                    className="ml-auto text-text-muted group-hover:text-text"
-                  />
-                </div>
-                <p className="mt-2 text-[13px] leading-[19.5px] text-text-secondary">
-                  {cat.desc}
-                </p>
-                <ul className="mt-3 flex flex-wrap gap-1">
-                  {cat.pages.map((p) => (
-                    <li
-                      key={p}
-                      className="text-[11.5px] text-text-secondary border border-border-subtle bg-bg rounded-sm px-1.5 py-0.5"
-                    >
-                      {p}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      {/* Featured guides + sidebar */}
-      <section id="what-is-omium" className="mt-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
-          <SectionHeader
-            icon={BookOpen}
-            eyebrow="Featured"
-            title="Popular guides"
-          />
-          <div className="rounded-lg border border-border-subtle bg-surface overflow-hidden">
-            {popularGuides.map((row, i) => (
+            <div className="mt-7 flex flex-wrap gap-3">
               <Link
-                key={row.to}
-                to={row.to}
-                className={`group flex items-start gap-3 px-4 py-3.5 hover:bg-bg/60 transition-colors ${
-                  i !== 0 ? "border-t border-border-subtle" : ""
-                }`}
+                to="/docs/get-started"
+                className="btn-copper inline-flex items-center gap-2 h-11 px-5 text-[11px]"
               >
-                <div className="h-8 w-8 shrink-0 rounded-md border border-border-subtle bg-bg flex items-center justify-center">
-                  <row.icon size={13} className="text-text" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[13.5px] font-medium text-text">
-                      {row.title}
+                <Rocket size={13} />
+                Start the quickstart
+              </Link>
+              <Link
+                to="/docs/api-reference"
+                className="inline-flex items-center gap-2 h-11 px-5 rounded-full border border-hairline bg-white/[0.03] text-white text-[11px] uppercase tracking-[0.18em] font-medium hover:border-copper/40 hover:text-copper transition-colors"
+              >
+                <Network size={13} />
+                API reference
+              </Link>
+            </div>
+          </div>
+
+          {/* Terminal card */}
+          <div className="rounded-2xl border border-hairline bg-panel overflow-hidden">
+            <div className="flex items-center gap-2 px-4 py-3 border-b border-hairline">
+              <div className="size-3 rounded-full bg-[#FF5F56]" />
+              <div className="size-3 rounded-full bg-[#FFBD2E]" />
+              <div className="size-3 rounded-full bg-[#27C93F]" />
+              <span className="ml-2 text-[11px] font-mono text-white/55">terminal</span>
+              <span className="ml-auto text-[10.5px] font-mono text-white/30 uppercase tracking-wider">
+                ~/omium
+              </span>
+            </div>
+            <pre className="p-5 font-mono text-[13px] leading-[22px] text-white/90 bg-charcoal">
+              <span className="text-copper">$</span> pip install omium{"\n"}
+              <span className="text-copper">$</span> export{" "}
+              <span className="tok-keyword">OMIUM_API_KEY</span>=
+              <span className="tok-string">"omk_..."</span>{"\n"}
+              <span className="text-copper">$</span> omium run hello.py::summarize \{"\n"}
+              {"  "}--arg text=<span className="tok-string">"Omium runs production AI."</span>{"\n\n"}
+              <span className="tok-comment">→ run_01H8XK… ✓ summarize · 412ms · $0.0004</span>
+            </pre>
+          </div>
+        </section>
+
+        {/* Category grid */}
+        <section className="mt-16">
+          <SectionHeader eyebrow="Browse" title="Pick a path" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {categories.map((cat) => (
+              <Link
+                key={cat.title}
+                to={cat.to}
+                className="group relative overflow-hidden glass-card p-5"
+              >
+                <div className="relative">
+                  <div className="flex items-center gap-2.5">
+                    <div className="h-9 w-9 rounded-lg border border-hairline bg-white/[0.03] flex items-center justify-center group-hover:border-copper/30 group-hover:bg-copper/10 transition-colors">
+                      <cat.icon size={15} className="text-copper" />
+                    </div>
+                    <span className="text-[16px] font-semibold text-white tracking-[-0.015em]">
+                      {cat.title}
                     </span>
-                    <span className="text-[10.5px] font-medium text-text-muted border border-border-subtle bg-bg rounded-sm px-1.5 py-[2px] uppercase tracking-wide">
-                      {row.tag}
-                    </span>
+                    <ArrowUpRight
+                      size={14}
+                      className="ml-auto text-white/35 group-hover:text-copper transition-colors"
+                    />
                   </div>
-                  <p className="mt-0.5 text-[13px] leading-[19.5px] text-text-secondary">
-                    {row.desc}
+                  <p className="mt-3 text-[13.5px] leading-[20px] text-white/55">
+                    {cat.desc}
                   </p>
+                  <ul className="mt-3.5 flex flex-wrap gap-1.5">
+                    {cat.pages.map((p) => (
+                      <li
+                        key={p}
+                        className="text-[10.5px] uppercase tracking-[0.15em] font-medium text-white/45 border border-hairline bg-white/[0.02] rounded-sm px-1.5 py-[3px]"
+                      >
+                        {p}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <ArrowUpRight
-                  size={14}
-                  className="text-text-muted group-hover:text-text shrink-0 mt-1"
-                />
               </Link>
             ))}
           </div>
+        </section>
 
-          <div id="changelog" className="mt-10">
-            <SectionHeader
-              eyebrow="Recent"
-              title="Changelog"
-              right={
-                <a className="text-[12.5px] text-text-secondary hover:text-text inline-flex items-center gap-1 cursor-pointer">
-                  All updates <ArrowUpRight size={12} />
-                </a>
-              }
-            />
-            <ol className="relative ml-3 border-l border-border-subtle">
-              {changelog.map((row) => (
-                <li key={row.title} className="relative pl-6 pb-5 last:pb-0">
-                  <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-text" />
-                  <div className="text-[11.5px] text-text-muted font-mono">
-                    {row.date}
+        {/* Featured guides + side */}
+        <section id="what-is-omium" className="mt-16 grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <SectionHeader icon={BookOpen} eyebrow="Featured" title="Popular guides" />
+            <div className="rounded-xl border border-hairline bg-panel overflow-hidden">
+              {popularGuides.map((row, i) => (
+                <Link
+                  key={row.to}
+                  to={row.to}
+                  className={`group flex items-start gap-4 px-5 py-4 hover:bg-white/[0.025] transition-colors ${
+                    i !== 0 ? "border-t border-hairline" : ""
+                  }`}
+                >
+                  <div className="h-9 w-9 shrink-0 rounded-lg border border-hairline bg-white/[0.02] flex items-center justify-center group-hover:border-copper/30 transition-colors">
+                    <row.icon size={14} className="text-copper" />
                   </div>
-                  <div className="mt-0.5 text-[14px] font-medium text-text">
-                    {row.title}
-                  </div>
-                  <p className="mt-0.5 text-[13px] leading-[19.5px] text-text-secondary">
-                    {row.detail}
-                  </p>
-                </li>
-              ))}
-            </ol>
-          </div>
-        </div>
-
-        <aside className="space-y-8">
-          <div>
-            <SectionHeader icon={Clock} eyebrow="Activity" title="Recently updated" />
-            <ul className="rounded-lg border border-border-subtle bg-surface overflow-hidden">
-              {recentDocs.map((d, i) => (
-                <li key={d.to}>
-                  <Link
-                    to={d.to}
-                    className={`flex items-start gap-2 px-3 py-2.5 hover:bg-bg/60 ${
-                      i !== 0 ? "border-t border-border-subtle" : ""
-                    }`}
-                  >
-                    <span className="mt-[6px] h-1 w-1 rounded-full bg-text-muted shrink-0" />
-                    <div className="min-w-0">
-                      <div className="text-[13px] text-text truncate">
-                        {d.label}
-                      </div>
-                      <div className="mt-0.5 text-[11px] uppercase tracking-wide text-text-muted">
-                        {d.tag}
-                      </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[14.5px] font-semibold text-white">
+                        {row.title}
+                      </span>
+                      <span className="text-[9.5px] font-medium text-copper/80 border border-copper/25 bg-copper/[0.06] rounded-sm px-1.5 py-[2px] uppercase tracking-[0.15em]">
+                        {row.tag}
+                      </span>
                     </div>
-                  </Link>
-                </li>
+                    <p className="mt-1 text-[13px] leading-[20px] text-white/55">
+                      {row.desc}
+                    </p>
+                  </div>
+                  <ArrowUpRight
+                    size={14}
+                    className="text-white/30 group-hover:text-copper shrink-0 mt-2 transition-colors"
+                  />
+                </Link>
               ))}
-            </ul>
+            </div>
+
+            <div id="changelog" className="mt-12">
+              <SectionHeader
+                eyebrow="Recent"
+                title="Changelog"
+                right={
+                  <a className="text-[10.5px] uppercase tracking-[0.2em] font-medium text-white/45 hover:text-copper inline-flex items-center gap-1.5 cursor-pointer transition-colors link-underline">
+                    All updates <ArrowUpRight size={11} />
+                  </a>
+                }
+              />
+              <ol className="relative ml-3 border-l border-hairline">
+                {changelog.map((row) => (
+                  <li key={row.title} className="relative pl-6 pb-6 last:pb-0">
+                    <span className="absolute -left-[5px] top-1.5 h-2 w-2 rounded-full bg-copper shadow-[0_0_10px_rgba(222,146,79,0.6)]" />
+                    <div className="text-[10.5px] uppercase tracking-[0.2em] text-white/35 font-mono">
+                      {row.date}
+                    </div>
+                    <div className="mt-1 text-[15px] font-semibold text-white tracking-[-0.01em]">
+                      {row.title}
+                    </div>
+                    <p className="mt-1 text-[13.5px] leading-[20px] text-white/55">
+                      {row.detail}
+                    </p>
+                  </li>
+                ))}
+              </ol>
+            </div>
           </div>
 
-          {/* What's new */}
-          <div className="relative overflow-hidden rounded-lg border border-border-subtle bg-surface p-4">
-            <div
-              className="absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-70"
-              style={{
-                background:
-                  "radial-gradient(closest-side, var(--color-accent-yellow), transparent 70%)",
-              }}
-              aria-hidden
-            />
-            <div className="relative">
+          <aside className="space-y-8">
+            <div>
+              <SectionHeader icon={Clock} eyebrow="Activity" title="Recently updated" />
+              <ul className="rounded-xl border border-hairline bg-panel overflow-hidden">
+                {recentDocs.map((d, i) => (
+                  <li key={d.to}>
+                    <Link
+                      to={d.to}
+                      className={`flex items-start gap-2.5 px-3.5 py-3 hover:bg-white/[0.025] transition-colors ${
+                        i !== 0 ? "border-t border-hairline" : ""
+                      }`}
+                    >
+                      <span className="mt-[7px] h-1.5 w-1.5 rounded-full bg-copper/70 shrink-0" />
+                      <div className="min-w-0">
+                        <div className="text-[13px] text-white truncate">
+                          {d.label}
+                        </div>
+                        <div className="mt-0.5 text-[9.5px] uppercase tracking-[0.18em] text-white/35 font-mono">
+                          {d.tag}
+                        </div>
+                      </div>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* What's new (copper) */}
+            <div className="glass-card-copper p-5">
               <div className="flex items-center gap-1.5">
-                <Sparkles size={12} className="text-text" />
-                <span className="text-[10.5px] uppercase tracking-[0.1em] font-medium text-text-muted">
+                <Sparkles size={12} className="text-copper" />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-copper">
                   New
                 </span>
               </div>
-              <div className="mt-1 text-[14px] font-semibold text-text">
+              <div className="mt-2 text-[15px] font-semibold text-white tracking-[-0.01em]">
                 LLM routing v2
               </div>
-              <p className="mt-1 text-[13px] leading-[19.5px] text-text-secondary">
+              <p className="mt-1.5 text-[13.5px] leading-[20px] text-white/60">
                 Route across providers by weight, cost ceiling, and latency
                 target. Public preview.
               </p>
               <Link
                 to="/docs/concepts#llm-routing"
-                className="mt-2 inline-flex items-center gap-1 text-[13px] text-text font-medium hover:underline"
+                className="mt-3 inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.18em] text-copper font-semibold hover:text-white transition-colors link-underline"
               >
                 Read the guide
-                <ArrowUpRight size={13} />
+                <ArrowUpRight size={12} />
               </Link>
             </div>
-          </div>
 
-          {/* Auth quick card */}
-          <div className="rounded-lg border border-border-subtle bg-surface p-4">
-            <div className="flex items-center gap-1.5">
-              <KeyRound size={12} className="text-text-muted" />
-              <span className="text-[10.5px] uppercase tracking-[0.1em] font-medium text-text-muted">
-                Reference
-              </span>
+            <div className="glass-card p-5">
+              <div className="flex items-center gap-1.5">
+                <KeyRound size={11} className="text-white/45" />
+                <span className="text-[10px] uppercase tracking-[0.2em] font-medium text-white/45">
+                  Reference
+                </span>
+              </div>
+              <div className="mt-2 text-[15px] font-semibold text-white tracking-[-0.01em]">
+                Authentication
+              </div>
+              <p className="mt-1.5 text-[13.5px] leading-[20px] text-white/55">
+                Workspace API keys, bearer tokens, scoping, and rotation.
+              </p>
+              <Link
+                to="/docs/api-reference#auth"
+                className="mt-3 inline-flex items-center gap-1.5 text-[12px] uppercase tracking-[0.18em] text-white/65 font-semibold hover:text-copper transition-colors link-underline"
+              >
+                API auth
+                <ArrowUpRight size={12} />
+              </Link>
             </div>
-            <div className="mt-1 text-[14px] font-semibold text-text">
-              Authentication
-            </div>
-            <p className="mt-1 text-[13px] leading-[19.5px] text-text-secondary">
-              Workspace API keys, bearer tokens, scoping, and rotation.
-            </p>
-            <Link
-              to="/docs/api-reference#auth"
-              className="mt-2 inline-flex items-center gap-1 text-[13px] text-text font-medium hover:underline"
-            >
-              API auth →
-            </Link>
-          </div>
-        </aside>
-      </section>
+          </aside>
+        </section>
 
-      {/* Foot */}
-      <footer className="mt-16 pt-6 border-t border-border-subtle flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[12.5px] text-text-muted">
-        <div className="flex items-center gap-2">
-          <span>© 2026 Omium</span>
-          <span>·</span>
-          <a className="hover:text-text cursor-pointer">Privacy</a>
-          <span>·</span>
-          <a className="hover:text-text cursor-pointer">Terms</a>
-          <span>·</span>
-          <a className="hover:text-text cursor-pointer">Status</a>
-        </div>
-        <div className="flex items-center gap-3">
-          <a className="hover:text-text cursor-pointer">GitHub</a>
-          <a className="hover:text-text cursor-pointer">Community</a>
-          <a className="hover:text-text cursor-pointer">Support</a>
-        </div>
-      </footer>
+        {/* Footer */}
+        <footer className="mt-20 pt-8 border-t border-hairline flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-[10.5px] uppercase tracking-[0.18em] font-medium text-white/40">
+          <div className="flex items-center gap-3 flex-wrap">
+            <span>© 2026 Omium</span>
+            <span className="text-white/20">·</span>
+            <a className="hover:text-copper cursor-pointer transition-colors">Privacy</a>
+            <span className="text-white/20">·</span>
+            <a className="hover:text-copper cursor-pointer transition-colors">Terms</a>
+            <span className="text-white/20">·</span>
+            <a className="hover:text-copper cursor-pointer transition-colors">Status</a>
+          </div>
+          <div className="flex items-center gap-4">
+            <a className="hover:text-copper cursor-pointer transition-colors link-underline">GitHub</a>
+            <a className="hover:text-copper cursor-pointer transition-colors link-underline">Community</a>
+            <a className="hover:text-copper cursor-pointer transition-colors link-underline">Support</a>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 }
@@ -417,17 +383,17 @@ function SectionHeader({
   right?: React.ReactNode;
 }) {
   return (
-    <div className="mb-3 flex items-end justify-between gap-3">
+    <div className="mb-4 flex items-end justify-between gap-3">
       <div>
         {eyebrow && (
-          <div className="flex items-center gap-1.5 mb-1">
-            {Icon && <Icon size={12} className="text-text-muted" />}
-            <span className="text-[10.5px] uppercase tracking-[0.1em] font-medium text-text-muted">
+          <div className="flex items-center gap-1.5 mb-1.5">
+            {Icon && <Icon size={11} className="text-copper" />}
+            <span className="text-[10px] uppercase tracking-[0.25em] font-medium text-copper">
               {eyebrow}
             </span>
           </div>
         )}
-        <h2 className="text-[18px] font-semibold tracking-[-0.015em] text-text leading-[24px]">
+        <h2 className="text-[22px] font-bold tracking-[-0.025em] text-white leading-[26px]">
           {title}
         </h2>
       </div>

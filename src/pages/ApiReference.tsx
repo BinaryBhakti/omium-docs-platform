@@ -135,8 +135,8 @@ export function ApiReference() {
       </p>
 
       <h2 id="endpoints">Endpoints</h2>
-      <div className="not-prose my-4 rounded-lg border border-border-subtle bg-surface overflow-hidden">
-        <div className="grid grid-cols-[88px_1fr_240px] items-center gap-3 px-4 h-9 border-b border-border-subtle bg-bg text-[11px] uppercase tracking-[0.08em] text-text-muted">
+      <div className="not-prose my-5 rounded-xl border border-hairline bg-panel overflow-hidden">
+        <div className="grid grid-cols-[96px_1fr_240px] items-center gap-3 px-4 h-10 border-b border-hairline bg-white/[0.02] text-[10px] uppercase tracking-[0.2em] font-medium text-white/45">
           <div>Method</div>
           <div>Path</div>
           <div className="hidden sm:block">Description</div>
@@ -145,15 +145,15 @@ export function ApiReference() {
           <a
             key={e.path + e.method}
             href={e.id ? `#${e.id}` : undefined}
-            className={`grid grid-cols-[88px_1fr_240px] items-center gap-3 px-4 h-11 hover:bg-bg/60 transition-colors ${
-              i !== 0 ? "border-t border-border-subtle" : ""
+            className={`grid grid-cols-[96px_1fr_240px] items-center gap-3 px-4 h-12 hover:bg-white/[0.025] transition-colors ${
+              i !== 0 ? "border-t border-hairline" : ""
             }`}
           >
             <div>
               <MethodBadge method={e.method} size="sm" />
             </div>
-            <div className="font-mono text-[13px] text-text truncate">{e.path}</div>
-            <div className="hidden sm:block text-[12.5px] text-text-secondary truncate">
+            <div className="font-mono text-[13px] text-white truncate">{e.path}</div>
+            <div className="hidden sm:block text-[12.5px] text-white/55 truncate">
               {e.desc}
             </div>
           </a>
@@ -292,9 +292,9 @@ SIGNED=$(printf "%s.%s" "$TIMESTAMP" "$BODY" | openssl dgst -sha256 -hmac "$WEBH
 
 function EndpointBlock({ method, path }: { method: string; path: string }) {
   return (
-    <div className="not-prose my-3 flex items-center gap-3 rounded-md border border-border-subtle bg-surface px-3 h-10">
+    <div className="not-prose my-3 flex items-center gap-3 rounded-lg border border-hairline bg-panel px-3.5 h-11">
       <MethodBadge method={method} />
-      <code className="font-mono text-[13px] text-text">{path}</code>
+      <code className="font-mono text-[13px] text-white">{path}</code>
     </div>
   );
 }

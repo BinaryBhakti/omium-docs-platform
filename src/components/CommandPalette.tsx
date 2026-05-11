@@ -90,7 +90,6 @@ export function CommandPalette({ open, onClose }: Props) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open, filtered, active, onClose, navigate]);
 
-  // Group by section for display
   const grouped = useMemo(() => {
     const m = new Map<string, Item[]>();
     filtered.forEach((it) => {
@@ -106,18 +105,21 @@ export function CommandPalette({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center pt-[10vh] px-4 bg-text/35 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-start justify-center pt-[10vh] px-4 bg-black/70 backdrop-blur-sm animate-fade-in-up"
       onClick={onClose}
       role="dialog"
       aria-modal
     >
       <div
-        className="w-full max-w-[620px] rounded-xl border border-border-subtle bg-surface overflow-hidden"
+        className="w-full max-w-[620px] rounded-2xl border border-hairline bg-panel overflow-hidden copper-glow"
         onClick={(e) => e.stopPropagation()}
-        style={{ boxShadow: "0 0 0 1px rgba(8,9,10,0.04)" }}
+        style={{
+          background:
+            "linear-gradient(160deg, rgba(20,20,22,0.95) 0%, rgba(12,12,14,0.98) 100%)",
+        }}
       >
-        <div className="flex items-center gap-2 px-3 h-12 border-b border-border-subtle">
-          <Search size={15} className="text-text-muted shrink-0" />
+        <div className="flex items-center gap-2.5 px-4 h-12 border-b border-hairline">
+          <Search size={15} className="text-copper shrink-0" />
           <input
             ref={inputRef}
             value={query}
@@ -126,12 +128,12 @@ export function CommandPalette({ open, onClose }: Props) {
               setActive(0);
             }}
             placeholder="Search documentation, concepts, endpoints…"
-            className="flex-1 bg-transparent text-[14px] text-text placeholder:text-text-muted outline-none border-none"
+            className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 outline-none border-none font-mono"
           />
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-text-muted hover:text-text hover:bg-[color:var(--color-hover)]"
+            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white/45 hover:text-white hover:bg-white/[0.06]"
             aria-label="Close"
           >
             <X size={14} />
@@ -140,13 +142,13 @@ export function CommandPalette({ open, onClose }: Props) {
 
         <div className="max-h-[60vh] overflow-y-auto py-2">
           {filtered.length === 0 ? (
-            <div className="px-4 py-10 text-center text-[13px] text-text-muted">
-              No results for <span className="text-text">"{query}"</span>
+            <div className="px-4 py-12 text-center text-[13px] text-white/40 font-mono">
+              No results for <span className="text-copper">"{query}"</span>
             </div>
           ) : (
             grouped.map(([group, list]) => (
               <div key={group} className="px-1 pb-1">
-                <div className="px-3 pt-2 pb-1 text-[10.5px] uppercase tracking-[0.1em] font-medium text-text-muted">
+                <div className="px-3 pt-3 pb-1.5 text-[10px] uppercase tracking-[0.2em] font-medium text-white/35">
                   {group}
                 </div>
                 {list.map((it) => {
@@ -159,18 +161,18 @@ export function CommandPalette({ open, onClose }: Props) {
                       to={it.to}
                       onClick={onClose}
                       onMouseEnter={() => setActive(flatIdx)}
-                      className={`flex items-center gap-2.5 mx-1 px-2 h-8 rounded-md text-[13px] transition-colors
+                      className={`flex items-center gap-2.5 mx-1 px-2.5 h-9 rounded-md text-[13px] transition-colors
                         ${isActive
-                          ? "bg-[color:var(--color-active)] text-text"
-                          : "text-text-secondary hover:bg-[color:var(--color-hover)]"
+                          ? "bg-copper/15 text-white"
+                          : "text-white/60 hover:bg-white/[0.04]"
                         }`}
                     >
-                      <Icon size={13} className={isActive ? "text-text" : "text-text-muted"} />
+                      <Icon size={13} className={isActive ? "text-copper" : "text-white/40"} />
                       <span className="flex-1 truncate">{it.label}</span>
                       {isActive && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-text-muted">
+                        <span className="inline-flex items-center gap-1 text-[10.5px] text-copper font-mono uppercase tracking-wider">
                           <CornerDownLeft size={11} />
-                          Enter
+                          Open
                         </span>
                       )}
                     </Link>
@@ -181,17 +183,17 @@ export function CommandPalette({ open, onClose }: Props) {
           )}
         </div>
 
-        <div className="flex items-center justify-between h-9 px-3 border-t border-border-subtle bg-bg text-[11px] text-text-muted">
+        <div className="flex items-center justify-between h-10 px-4 border-t border-hairline bg-black/30 text-[10.5px] text-white/35 font-mono uppercase tracking-wider">
           <div className="flex items-center gap-3">
             <Kbd>↑</Kbd>
             <Kbd>↓</Kbd>
-            <span>Navigate</span>
+            <span>Nav</span>
             <Kbd>↵</Kbd>
             <span>Open</span>
             <Kbd>Esc</Kbd>
             <span>Close</span>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5">
+          <div className="hidden sm:flex items-center gap-1.5 text-copper/70">
             <span>Omium Docs</span>
           </div>
         </div>
@@ -202,7 +204,7 @@ export function CommandPalette({ open, onClose }: Props) {
 
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="font-mono text-[10.5px] leading-none rounded-sm border border-border-subtle bg-surface px-1.5 py-1 text-text-muted">
+    <kbd className="font-mono text-[10px] leading-none rounded-sm border border-hairline bg-white/[0.04] px-1.5 py-1 text-white/50">
       {children}
     </kbd>
   );

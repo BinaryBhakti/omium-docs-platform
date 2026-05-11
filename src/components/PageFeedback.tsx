@@ -5,53 +5,54 @@ export function PageFeedback() {
   const [vote, setVote] = useState<null | "up" | "down">(null);
 
   return (
-    <div className="not-prose mt-14 pt-6 border-t border-border-subtle max-w-[720px]">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div className="not-prose mt-16 pt-7 border-t border-hairline max-w-[720px]">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="text-[13px] text-text-secondary">
-            Was this page helpful?
+          <span className="text-[12px] uppercase tracking-[0.18em] font-medium text-white/55">
+            Was this helpful?
           </span>
-          <div className="inline-flex rounded-md border border-border-subtle bg-surface overflow-hidden">
+          <div className="inline-flex rounded-full border border-hairline bg-white/[0.02] overflow-hidden">
             <button
               type="button"
               onClick={() => setVote("up")}
               aria-pressed={vote === "up"}
-              className={`inline-flex items-center gap-1.5 h-7 px-2.5 text-[12.5px] transition-colors
+              className={`inline-flex items-center gap-1.5 h-8 px-3 text-[11px] uppercase tracking-[0.15em] transition-colors
                 ${vote === "up"
-                  ? "bg-accent-yellow text-text"
-                  : "text-text-secondary hover:text-text hover:bg-[color:var(--color-hover)]"}`}
+                  ? "bg-copper text-black"
+                  : "text-white/55 hover:text-white hover:bg-white/[0.04]"}`}
             >
-              <ThumbsUp size={12} />
+              <ThumbsUp size={11} />
               Yes
             </button>
-            <span className="w-px bg-border-subtle" />
+            <span className="w-px bg-hairline" />
             <button
               type="button"
               onClick={() => setVote("down")}
               aria-pressed={vote === "down"}
-              className={`inline-flex items-center gap-1.5 h-7 px-2.5 text-[12.5px] transition-colors
+              className={`inline-flex items-center gap-1.5 h-8 px-3 text-[11px] uppercase tracking-[0.15em] transition-colors
                 ${vote === "down"
-                  ? "bg-accent-pink/70 text-text"
-                  : "text-text-secondary hover:text-text hover:bg-[color:var(--color-hover)]"}`}
+                  ? "bg-white/15 text-white"
+                  : "text-white/55 hover:text-white hover:bg-white/[0.04]"}`}
             >
-              <ThumbsDown size={12} />
+              <ThumbsDown size={11} />
               No
             </button>
           </div>
           {vote && (
-            <span className="text-[12px] text-text-muted">Thanks for the feedback.</span>
+            <span className="text-[11.5px] text-copper font-mono">
+              Thanks for the feedback.
+            </span>
           )}
         </div>
 
-        <div className="flex items-center gap-3 text-[12.5px]">
-          <a className="inline-flex items-center gap-1.5 text-text-secondary hover:text-text cursor-pointer">
-            <Github size={12} />
+        <div className="flex items-center gap-4 text-[11.5px] uppercase tracking-[0.15em]">
+          <a className="inline-flex items-center gap-1.5 text-white/45 hover:text-copper cursor-pointer transition-colors link-underline">
+            <Github size={11} />
             Edit on GitHub
           </a>
-          <span className="text-text-muted">·</span>
-          <a className="inline-flex items-center gap-1.5 text-text-secondary hover:text-text cursor-pointer">
-            <MessageSquare size={12} />
-            Ask in community
+          <a className="inline-flex items-center gap-1.5 text-white/45 hover:text-copper cursor-pointer transition-colors link-underline">
+            <MessageSquare size={11} />
+            Community
           </a>
         </div>
       </div>

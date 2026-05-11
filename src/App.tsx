@@ -43,7 +43,7 @@ export default function App() {
   }, [location]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-bg">
+    <div className="min-h-screen flex flex-col bg-charcoal text-white">
       <TopBar
         onMenuClick={() => setMobileOpen(true)}
         onSearchClick={() => setPaletteOpen(true)}

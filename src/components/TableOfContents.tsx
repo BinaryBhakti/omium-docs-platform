@@ -21,7 +21,7 @@ export function TableOfContents({ items }: Props) {
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { rootMargin: "-84px 0px -70% 0px", threshold: [0, 1] }
+      { rootMargin: "-92px 0px -70% 0px", threshold: [0, 1] }
     );
     headings.forEach((h) => observer.observe(h));
     return () => observer.disconnect();
@@ -31,11 +31,11 @@ export function TableOfContents({ items }: Props) {
 
   return (
     <aside className="hidden xl:block w-[220px] shrink-0">
-      <div className="sticky top-[76px]">
-        <div className="text-[11px] uppercase tracking-[0.08em] font-medium text-text-muted mb-2 pl-3">
+      <div className="sticky top-[84px]">
+        <div className="text-[10px] uppercase tracking-[0.2em] font-medium text-white/45 mb-3 pl-3">
           On this page
         </div>
-        <ul className="border-l border-border-subtle">
+        <ul className="border-l border-hairline">
           {items.map((item) => {
             const isActive = active === item.id;
             return (
@@ -45,8 +45,8 @@ export function TableOfContents({ items }: Props) {
                   className={`block -ml-px pl-3 pr-2 py-[5px] text-[12.5px] leading-[18px] border-l transition-colors
                     ${
                       isActive
-                        ? "border-text text-text font-medium"
-                        : "border-transparent text-text-secondary hover:text-text"
+                        ? "border-copper text-copper font-medium"
+                        : "border-transparent text-white/50 hover:text-white"
                     }
                     ${item.depth === 3 ? "pl-7" : ""}
                   `}
@@ -59,10 +59,10 @@ export function TableOfContents({ items }: Props) {
         </ul>
 
         <div className="mt-6 pl-3 space-y-1.5">
-          <a className="block text-[12px] text-text-muted hover:text-text cursor-pointer">
+          <a className="block text-[11.5px] text-white/40 hover:text-copper cursor-pointer transition-colors">
             ↑ Back to top
           </a>
-          <a className="block text-[12px] text-text-muted hover:text-text cursor-pointer">
+          <a className="block text-[11.5px] text-white/40 hover:text-copper cursor-pointer transition-colors">
             Edit this page on GitHub
           </a>
         </div>

@@ -180,27 +180,25 @@ export function CodeBlock({ code, lang = "bash", filename, showLineNumbers = fal
   };
 
   return (
-    <div className="not-prose my-5 rounded-lg overflow-hidden border border-[color:var(--code-border)]"
-      style={{ background: "var(--code-bg)" }}>
-      <div className="flex items-center justify-between h-9 pl-3 pr-2 border-b border-[color:var(--code-border)]"
-        style={{ background: "var(--code-surface)" }}>
-        <div className="flex items-center gap-2 min-w-0 text-[color:var(--code-muted)]">
-          <div className="flex gap-1 mr-1">
-            <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
-            <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
-            <span className="h-2 w-2 rounded-full bg-[#3a3d42]" />
+    <div className="not-prose my-5 rounded-2xl overflow-hidden border border-hairline bg-panel">
+      <div className="flex items-center justify-between h-10 pl-4 pr-2 border-b border-hairline">
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="flex gap-1.5 mr-1">
+            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
           </div>
           {filename ? (
-            <span className="font-mono text-[12px] text-[color:var(--code-text)] truncate">
+            <span className="font-mono text-[11.5px] text-white/75 truncate ml-1">
               {filename}
             </span>
           ) : (
-            <span className="font-mono text-[11px] uppercase tracking-wide">
+            <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-white/45 ml-1">
               {lang}
             </span>
           )}
           {filename && (
-            <span className="font-mono text-[10.5px] uppercase tracking-wide ml-1">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 ml-1">
               · {lang}
             </span>
           )}
@@ -208,18 +206,17 @@ export function CodeBlock({ code, lang = "bash", filename, showLineNumbers = fal
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex items-center gap-1.5 h-7 px-2 rounded-sm text-[11.5px] text-[color:var(--code-muted)] hover:text-[color:var(--code-text)] hover:bg-white/5 transition-colors"
+          className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[10.5px] uppercase tracking-[0.15em] text-white/50 hover:text-copper hover:bg-white/[0.04] transition-colors"
         >
-          {copied ? <Check size={12} /> : <Copy size={12} />}
+          {copied ? <Check size={11} /> : <Copy size={11} />}
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      <div className="overflow-x-auto">
-        <pre className="px-4 py-3 text-[13.5px] font-mono leading-6"
-          style={{ color: "var(--code-text)" }}>
+      <div className="overflow-x-auto bg-charcoal">
+        <pre className="px-5 py-4 text-[13px] font-mono leading-[22px] text-white/90">
           {showLineNumbers ? (
-            <div className="grid grid-cols-[auto_1fr] gap-x-4">
-              <div className="text-right text-[color:var(--code-muted)] select-none">
+            <div className="grid grid-cols-[auto_1fr] gap-x-5">
+              <div className="text-right text-white/25 select-none">
                 {Array.from({ length: lines }).map((_, i) => (
                   <div key={i}>{i + 1}</div>
                 ))}

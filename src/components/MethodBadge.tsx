@@ -1,11 +1,11 @@
 type Method = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 const styles: Record<Method, string> = {
-  GET: "text-text border-border-strong bg-surface",
-  POST: "text-text border-[#caa86b] bg-accent-yellow",
-  PUT: "text-text border-[#c88f5a] bg-accent-orange/80",
-  PATCH: "text-text border-[#caa86b] bg-accent-orange/60",
-  DELETE: "text-text border-[#d97a9f] bg-accent-pink/80",
+  GET: "text-white/90 border-white/15 bg-white/[0.04]",
+  POST: "text-copper border-copper/40 bg-copper/10",
+  PUT: "text-copper border-copper/40 bg-copper/15",
+  PATCH: "text-copper border-copper/30 bg-copper/8",
+  DELETE: "text-[#ff8e8e] border-[#ff8e8e]/35 bg-[#ff8e8e]/8",
 };
 
 export function MethodBadge({ method, size = "md" }: { method: string; size?: "sm" | "md" }) {
@@ -13,11 +13,11 @@ export function MethodBadge({ method, size = "md" }: { method: string; size?: "s
   const cls = styles[m] ?? styles.GET;
   const sz =
     size === "sm"
-      ? "h-[18px] min-w-[40px] text-[10px] px-1.5"
-      : "h-[20px] min-w-[46px] text-[10.5px] px-1.5";
+      ? "h-[20px] min-w-[44px] text-[10px] px-1.5"
+      : "h-[22px] min-w-[50px] text-[10.5px] px-2";
   return (
     <span
-      className={`inline-flex items-center justify-center font-mono font-medium tracking-wide rounded-sm border ${sz} ${cls}`}
+      className={`inline-flex items-center justify-center font-mono font-medium tracking-[0.12em] uppercase rounded-md border ${sz} ${cls}`}
     >
       {m}
     </span>
