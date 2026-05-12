@@ -31,22 +31,22 @@ export function TableOfContents({ items }: Props) {
 
   return (
     <aside className="hidden xl:block w-[220px] shrink-0">
-      <div className="sticky top-[84px]">
-        <div className="text-[10px] uppercase tracking-[0.2em] font-medium text-white/45 mb-3 pl-3">
+      <div className="sticky top-[88px]">
+        <div className="font-mono text-meta uppercase text-text-tertiary mb-3">
           On this page
         </div>
-        <ul className="border-l border-hairline">
+        <ul className="border-l border-[color:var(--color-border-structural)]">
           {items.map((item) => {
             const isActive = active === item.id;
             return (
               <li key={item.id}>
                 <a
                   href={`#${item.id}`}
-                  className={`block -ml-px pl-3 pr-2 py-[5px] text-[12.5px] leading-[18px] border-l transition-colors
+                  className={`block -ml-px pl-3 pr-2 py-1.5 text-[12.5px] leading-[18px] border-l transition-colors
                     ${
                       isActive
-                        ? "border-copper text-copper font-medium"
-                        : "border-transparent text-white/50 hover:text-white"
+                        ? "border-text text-text font-medium"
+                        : "border-transparent text-text-tertiary hover:text-text-secondary"
                     }
                     ${item.depth === 3 ? "pl-7" : ""}
                   `}
@@ -58,13 +58,16 @@ export function TableOfContents({ items }: Props) {
           })}
         </ul>
 
-        <div className="mt-6 pl-3 space-y-1.5">
-          <a className="block text-[11.5px] text-white/40 hover:text-copper cursor-pointer transition-colors">
+        <div className="mt-6 pl-3">
+          <button
+            type="button"
+            onClick={() =>
+              window.scrollTo({ top: 0, behavior: "smooth" })
+            }
+            className="text-[12px] text-text-tertiary hover:text-text cursor-pointer transition-colors"
+          >
             ↑ Back to top
-          </a>
-          <a className="block text-[11.5px] text-white/40 hover:text-copper cursor-pointer transition-colors">
-            Edit this page on GitHub
-          </a>
+          </button>
         </div>
       </div>
     </aside>
