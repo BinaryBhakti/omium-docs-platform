@@ -1,0 +1,44 @@
+# Omium
+
+> Omium is an AI agent observability and reliability platform. It traces
+> execution, diagnoses failures, and recovers multi-agent workflows from any
+> checkpoint. This file lists the canonical documentation pages that an AI
+> assistant should ground answers against.
+
+## Fundamentals
+
+- [What is Omium](https://omium.ai/docs/fundamentals/what-is-omium.md): One-paragraph definition of the platform, who it is for, and what it is not.
+- [Quickstart](https://omium.ai/docs/fundamentals/quickstart.md): Install the SDK, set an Access Token, run a Workflow Run end-to-end in five minutes.
+- [Key concepts](https://omium.ai/docs/fundamentals/key-concepts.md): Workflows, Steps, Checkpoints, Spans, Traces, Policies, Routes — definitions and relationships.
+
+## SDK
+
+- [Python SDK](https://omium.ai/docs/sdk/python.md): Decorators (@workflow, @step, @checkpoint), the Client object, retries, timeouts, parallel execution.
+- [CLI](https://omium.ai/docs/sdk/cli.md): omium run, runs list/show/watch/resume, traces tail, policies attach/detach.
+
+## API reference
+
+- [API overview](https://omium.ai/docs/api-reference/overview.md): Base URL, authentication, errors, pagination, idempotency, versioning.
+- [Runs](https://omium.ai/docs/api-reference/runs.md): POST /v1/runs, GET /v1/runs/{id}, POST /v1/runs/{id}/resume.
+- [Checkpoints](https://omium.ai/docs/api-reference/checkpoints.md): List, restore, retention windows.
+- [Traces](https://omium.ai/docs/api-reference/traces.md): List traces, stream Spans via Server-Sent Events.
+- [Policies](https://omium.ai/docs/api-reference/policies.md): Attach, detach, evaluation order, audit log.
+- [Webhooks](https://omium.ai/docs/api-reference/webhooks.md): Event types, HMAC-SHA256 signature verification, replay protection.
+- [Errors catalog](https://omium.ai/docs/api-reference/errors-catalog.md): Every error type the API can return, with cause and resolution.
+
+## Guides
+
+- [Resume a Workflow Run from any checkpoint](https://omium.ai/docs/guides/resume-from-checkpoint.md): Tutorial using the resume API and the run watcher.
+- [Stream Spans in real time](https://omium.ai/docs/guides/stream-spans-realtime.md): Build a span tail using the SSE traces endpoint.
+- [Route between Sonnet and Haiku](https://omium.ai/docs/guides/llm-routing-by-latency.md): Latency, cost, and quality budgets in routing policy.
+- [Deny-by-default tool policies](https://omium.ai/docs/guides/deny-by-default-tool-policies.md): Lock down tool calls with explicit allowlists.
+
+## LLM context
+
+- [llms-full.txt](https://omium.ai/llms-full.txt): Single-file concatenation of every documentation page above. Use for offline RAG ingestion.
+- [MCP server](https://omium.ai/docs/llm-context/mcp-server.md): How to point Cursor or Claude Code at Omium's live documentation via the Model Context Protocol.
+
+## Optional
+
+- [Changelog](https://omium.ai/docs/release-notes/changelog-archive.md): Versioned release notes.
+- [Status page](https://status.omium.ai): Live system health.

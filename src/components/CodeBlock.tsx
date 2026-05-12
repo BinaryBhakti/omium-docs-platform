@@ -166,7 +166,12 @@ function highlightYaml(code: string): React.ReactNode {
   );
 }
 
-export function CodeBlock({ code, lang = "bash", filename, showLineNumbers = false }: Props) {
+export function CodeBlock({
+  code,
+  lang = "bash",
+  filename,
+  showLineNumbers = false,
+}: Props) {
   const [copied, setCopied] = useState(false);
   const rendered = useMemo(() => highlight(code, lang), [code, lang]);
   const lines = useMemo(() => code.split("\n").length, [code]);
@@ -176,49 +181,61 @@ export function CodeBlock({ code, lang = "bash", filename, showLineNumbers = fal
       await navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 1400);
-    } catch {/* ignore */}
+    } catch {
+      /* ignore */
+    }
   };
 
   return (
-    <div className="not-prose my-5 rounded-2xl overflow-hidden border border-hairline bg-panel">
-      <div className="flex items-center justify-between h-10 pl-4 pr-2 border-b border-hairline">
-        <div className="flex items-center gap-2 min-w-0">
-          <div className="flex gap-1.5 mr-1">
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FF5F56]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#FFBD2E]" />
-            <span className="h-2.5 w-2.5 rounded-full bg-[#27C93F]" />
-          </div>
-          {filename ? (
-            <span className="font-mono text-[11.5px] text-white/75 truncate ml-1">
-              {filename}
-            </span>
-          ) : (
-            <span className="font-mono text-[10.5px] uppercase tracking-[0.18em] text-white/45 ml-1">
-              {lang}
-            </span>
-          )}
-          {filename && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-white/35 ml-1">
-              · {lang}
-            </span>
-          )}
+    <div
+      className="not-prose group my-5 rounded-card overflow-hidden border border-[color:var(--color-border-hover)]"
+      style={{
+        background: "#0c0d0f",
+        boxShadow:
+          "inset 0 1px 0 rgba(255,255,255,0.04), 0 24px 60px -28px rgba(0,0,0,0.9)",
+      }}
+    >
+      {/* Header strip — clearly lifted lane, separated by a real hairline */}
+      <div
+        className="flex items-center justify-between px-4 h-10 border-b border-[color:var(--color-border)]"
+        style={{ background: "#16181b" }}
+      >
+        <div className="flex items-center gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#4a4e54]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#3d4147]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#3d4147]" />
         </div>
+        <span className="font-mono text-[11.5px] text-text-secondary truncate px-3">
+          {filename ? `${filename} · ${lang}` : lang}
+        </span>
         <button
           type="button"
           onClick={onCopy}
-          className="inline-flex items-center gap-1.5 h-7 px-2.5 rounded-md text-[10.5px] uppercase tracking-[0.15em] text-white/50 hover:text-copper hover:bg-white/[0.04] transition-colors"
+          aria-label={copied ? "Copied" : "Copy code"}
+          className="inline-flex items-center justify-center h-7 px-2 rounded font-mono text-[11px] text-text-tertiary hover:text-text hover:bg-bg-hover transition-colors"
         >
-          {copied ? <Check size={11} /> : <Copy size={11} />}
-          {copied ? "Copied" : "Copy"}
+          {copied ? (
+            <>
+              <Check size={11} className="mr-1" />
+              copied
+            </>
+          ) : (
+            <>
+              <Copy size={11} className="mr-1" />
+              copy
+            </>
+          )}
         </button>
       </div>
-      <div className="overflow-x-auto bg-charcoal">
-        <pre className="px-5 py-4 text-[13px] font-mono leading-[22px] text-white/90">
+
+      {/* Code body */}
+      <div className="overflow-x-auto">
+        <pre className="px-5 sm:px-6 py-5 font-mono text-[12.5px] sm:text-[13px] leading-relaxed text-text">
           {showLineNumbers ? (
             <div className="grid grid-cols-[auto_1fr] gap-x-5">
-              <div className="text-right text-white/25 select-none">
+              <div className="text-right text-text-quaternary select-none font-mono">
                 {Array.from({ length: lines }).map((_, i) => (
-                  <div key={i}>{i + 1}</div>
+                  <div key={i}>{String(i + 1).padStart(2, " ")}</div>
                 ))}
               </div>
               <code>{rendered}</code>

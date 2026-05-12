@@ -2,63 +2,132 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Search,
-  CornerDownLeft,
-  Hash,
-  FileText,
+  Compass,
   Rocket,
   Terminal,
   Network,
   Layers,
+  Plus,
+  PanelLeft,
+  Sparkles,
   X,
+  CornerDownLeft,
 } from "lucide-react";
 import { navigation } from "../data/navigation";
 
-type Item = {
+type NavItem = {
+  kind: "nav";
   label: string;
   to: string;
-  group: string;
+  section: string;
   icon: React.ComponentType<any>;
+  shortcut: [string, string];
 };
+type ActionItem = {
+  kind: "action";
+  label: string;
+  icon: React.ComponentType<any>;
+  shortcut: [string, string];
+  onRun: () => void;
+};
+type Item = NavItem | ActionItem;
 
 type Props = {
   open: boolean;
   onClose: () => void;
+  onOpenAskAi?: () => void;
 };
 
-const groupIcons: Record<string, React.ComponentType<any>> = {
-  Overview: FileText,
+const sectionIcons: Record<string, React.ComponentType<any>> = {
+  Overview: Compass,
   "Get started": Rocket,
   SDK: Terminal,
   "API reference": Network,
   "Platform concepts": Layers,
 };
 
-export function CommandPalette({ open, onClose }: Props) {
+// Derive a stable two-letter shortcut for an item: first letter of section,
+// first letter of item label. Purely visual — not wired to a global hotkey.
+function shortcutFor(section: string, label: string): [string, string] {
+  const a = (section.match(/[A-Za-z]/)?.[0] ?? "G").toUpperCase();
+  const words = label.split(/\s+/);
+  const b = (words[words.length === 1 ? 0 : 0].match(/[A-Za-z]/)?.[0] ?? "X").toUpperCase();
+  return [a, b];
+}
+
+export function CommandPalette({ open, onClose, onOpenAskAi }: Props) {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const items: Item[] = useMemo(() => {
+  const navItems: Item[] = useMemo(() => {
     return navigation.flatMap((section) =>
-      section.items.map((item) => ({
+      section.items.map<NavItem>((item) => ({
+        kind: "nav",
         label: item.label,
         to: item.to,
-        group: section.title,
-        icon: item.to.includes("#") ? Hash : groupIcons[section.title] ?? FileText,
+        section: section.title,
+        icon: sectionIcons[section.title] ?? Compass,
+        shortcut: shortcutFor(section.title, item.label),
       }))
     );
   }, []);
 
+  const actions: ActionItem[] = useMemo(
+    () => [
+      {
+        kind: "action",
+        label: "Ask AI about this page",
+        icon: Sparkles,
+        shortcut: ["⌘", "I"],
+        onRun: () => {
+          onClose();
+          onOpenAskAi?.();
+        },
+      },
+      {
+        kind: "action",
+        label: "Open GitHub repository",
+        icon: Plus,
+        shortcut: ["G", "H"],
+        onRun: () => {
+          window.open("https://github.com", "_blank", "noreferrer");
+          onClose();
+        },
+      },
+      {
+        kind: "action",
+        label: "Toggle sidebar",
+        icon: PanelLeft,
+        shortcut: ["⌘", "\\"],
+        onRun: onClose,
+      },
+    ],
+    [onClose, onOpenAskAi]
+  );
+
+  // Combine + filter
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return items;
-    return items.filter(
-      (i) =>
-        i.label.toLowerCase().includes(q) ||
-        i.group.toLowerCase().includes(q)
-    );
-  }, [items, query]);
+    const matches = (it: Item) => {
+      if (!q) return true;
+      const fields =
+        it.kind === "nav"
+          ? `${it.label} ${it.section}`
+          : it.label;
+      return fields.toLowerCase().includes(q);
+    };
+    return {
+      nav: navItems.filter(matches) as NavItem[],
+      actions: actions.filter(matches) as ActionItem[],
+    };
+  }, [navItems, actions, query]);
+
+  const flat: Item[] = useMemo(
+    () => [...filtered.nav, ...filtered.actions],
+    [filtered]
+  );
 
   useEffect(() => {
     if (open) {
@@ -74,30 +143,24 @@ export function CommandPalette({ open, onClose }: Props) {
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowDown") {
         e.preventDefault();
-        setActive((a) => Math.min(a + 1, filtered.length - 1));
+        setActive((a) => Math.min(a + 1, flat.length - 1));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setActive((a) => Math.max(a - 1, 0));
       } else if (e.key === "Enter") {
-        const target = filtered[active];
-        if (target) {
+        const target = flat[active];
+        if (!target) return;
+        if (target.kind === "nav") {
           navigate(target.to);
           onClose();
+        } else {
+          target.onRun();
         }
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, filtered, active, onClose, navigate]);
-
-  const grouped = useMemo(() => {
-    const m = new Map<string, Item[]>();
-    filtered.forEach((it) => {
-      if (!m.has(it.group)) m.set(it.group, []);
-      m.get(it.group)!.push(it);
-    });
-    return Array.from(m.entries());
-  }, [filtered]);
+  }, [open, flat, active, onClose, navigate]);
 
   if (!open) return null;
 
@@ -105,21 +168,23 @@ export function CommandPalette({ open, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center pt-[10vh] px-4 bg-black/70 backdrop-blur-sm animate-fade-in-up"
+      className="fixed inset-0 z-[60] flex items-start justify-center pt-[12vh] px-4 bg-black/80 backdrop-blur-sm"
       onClick={onClose}
       role="dialog"
       aria-modal
+      aria-label="Command palette"
     >
       <div
-        className="w-full max-w-[620px] rounded-2xl border border-hairline bg-panel overflow-hidden copper-glow"
+        className="w-full max-w-[660px] rounded-2xl bg-bg-elevated overflow-hidden"
         onClick={(e) => e.stopPropagation()}
         style={{
-          background:
-            "linear-gradient(160deg, rgba(20,20,22,0.95) 0%, rgba(12,12,14,0.98) 100%)",
+          boxShadow:
+            "0 0 0 1px rgba(255,255,255,0.06) inset, 0 30px 80px -20px rgba(0,0,0,0.85)",
         }}
       >
-        <div className="flex items-center gap-2.5 px-4 h-12 border-b border-hairline">
-          <Search size={15} className="text-copper shrink-0" />
+        {/* Search row */}
+        <div className="flex items-center gap-3 px-4 h-14">
+          <Search size={15} className="text-text-tertiary shrink-0" />
           <input
             ref={inputRef}
             value={query}
@@ -127,84 +192,181 @@ export function CommandPalette({ open, onClose }: Props) {
               setQuery(e.target.value);
               setActive(0);
             }}
-            placeholder="Search documentation, concepts, endpoints…"
-            className="flex-1 bg-transparent text-[14px] text-white placeholder:text-white/30 outline-none border-none font-mono"
+            placeholder="Type a command or search…"
+            className="flex-1 bg-transparent text-[15px] text-text placeholder:text-text-tertiary outline-none border-none"
           />
+          <div className="flex items-center gap-1">
+            <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
+          </div>
           <button
             type="button"
             onClick={onClose}
-            className="inline-flex h-7 w-7 items-center justify-center rounded-md text-white/45 hover:text-white hover:bg-white/[0.06]"
             aria-label="Close"
+            className="ml-1 inline-flex h-7 w-7 items-center justify-center rounded text-text-tertiary hover:text-text hover:bg-bg-hover"
           >
-            <X size={14} />
+            <X size={13} />
           </button>
         </div>
 
-        <div className="max-h-[60vh] overflow-y-auto py-2">
-          {filtered.length === 0 ? (
-            <div className="px-4 py-12 text-center text-[13px] text-white/40 font-mono">
-              No results for <span className="text-copper">"{query}"</span>
+        {/* Results */}
+        <div className="max-h-[58vh] overflow-y-auto pb-2">
+          {flat.length === 0 ? (
+            <div className="px-4 py-12 text-center text-[13px] text-text-tertiary">
+              No results for{" "}
+              <span className="text-text font-mono">"{query}"</span>
             </div>
           ) : (
-            grouped.map(([group, list]) => (
-              <div key={group} className="px-1 pb-1">
-                <div className="px-3 pt-3 pb-1.5 text-[10px] uppercase tracking-[0.2em] font-medium text-white/35">
-                  {group}
-                </div>
-                {list.map((it) => {
-                  flatIdx++;
-                  const isActive = flatIdx === active;
-                  const Icon = it.icon;
-                  return (
-                    <Link
-                      key={it.to + it.label}
-                      to={it.to}
-                      onClick={onClose}
-                      onMouseEnter={() => setActive(flatIdx)}
-                      className={`flex items-center gap-2.5 mx-1 px-2.5 h-9 rounded-md text-[13px] transition-colors
-                        ${isActive
-                          ? "bg-copper/15 text-white"
-                          : "text-white/60 hover:bg-white/[0.04]"
-                        }`}
-                    >
-                      <Icon size={13} className={isActive ? "text-copper" : "text-white/40"} />
-                      <span className="flex-1 truncate">{it.label}</span>
-                      {isActive && (
-                        <span className="inline-flex items-center gap-1 text-[10.5px] text-copper font-mono uppercase tracking-wider">
-                          <CornerDownLeft size={11} />
-                          Open
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            ))
+            <>
+              {filtered.nav.length > 0 && (
+                <Section title="Navigate">
+                  {filtered.nav.map((it) => {
+                    flatIdx++;
+                    const isActive = flatIdx === active;
+                    return (
+                      <Row
+                        key={`nav-${it.to}-${it.label}`}
+                        item={it}
+                        isActive={isActive}
+                        onHover={(idx) => setActive(idx)}
+                        idx={flatIdx}
+                        renderAs={(content) => (
+                          <Link
+                            to={it.to}
+                            onClick={onClose}
+                            className="block"
+                          >
+                            {content}
+                          </Link>
+                        )}
+                      />
+                    );
+                  })}
+                </Section>
+              )}
+
+              {filtered.actions.length > 0 && (
+                <Section title="Actions">
+                  {filtered.actions.map((it) => {
+                    flatIdx++;
+                    const isActive = flatIdx === active;
+                    return (
+                      <Row
+                        key={`act-${it.label}`}
+                        item={it}
+                        isActive={isActive}
+                        onHover={(idx) => setActive(idx)}
+                        idx={flatIdx}
+                        renderAs={(content) => (
+                          <button
+                            type="button"
+                            onClick={it.onRun}
+                            className="block w-full text-left"
+                          >
+                            {content}
+                          </button>
+                        )}
+                      />
+                    );
+                  })}
+                </Section>
+              )}
+            </>
           )}
         </div>
 
-        <div className="flex items-center justify-between h-10 px-4 border-t border-hairline bg-black/30 text-[10.5px] text-white/35 font-mono uppercase tracking-wider">
-          <div className="flex items-center gap-3">
-            <Kbd>↑</Kbd>
-            <Kbd>↓</Kbd>
-            <span>Nav</span>
-            <Kbd>↵</Kbd>
-            <span>Open</span>
-            <Kbd>Esc</Kbd>
-            <span>Close</span>
+        {/* Footer */}
+        <div className="flex items-center justify-between h-11 px-4 bg-bg-card text-[12px] text-text-tertiary">
+          <div className="flex items-center gap-4">
+            <span className="inline-flex items-center gap-1.5">
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+              <span>navigate</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Kbd>
+                <CornerDownLeft size={9} />
+              </Kbd>
+              <span>open</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Kbd>esc</Kbd>
+              <span>close</span>
+            </span>
           </div>
-          <div className="hidden sm:flex items-center gap-1.5 text-copper/70">
-            <span>Omium Docs</span>
-          </div>
+          <span className="font-mono text-[11px] text-text-tertiary">
+            v1.0 · omium
+          </span>
         </div>
       </div>
     </div>
   );
 }
 
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="px-2 pt-3">
+      <div className="px-3 pb-1.5 text-[12px] text-text-tertiary">{title}</div>
+      <div className="space-y-0.5">{children}</div>
+    </div>
+  );
+}
+
+function Row({
+  item,
+  isActive,
+  onHover,
+  idx,
+  renderAs,
+}: {
+  item: Item;
+  isActive: boolean;
+  onHover: (i: number) => void;
+  idx: number;
+  renderAs: (content: React.ReactNode) => React.ReactNode;
+}) {
+  const Icon = item.icon;
+  return (
+    <div onMouseEnter={() => onHover(idx)}>
+      {renderAs(
+        <div
+          className={`group flex items-center gap-3 h-11 px-2 rounded-md transition-colors ${
+            isActive ? "bg-bg-hover" : "hover:bg-bg-hover/60"
+          }`}
+        >
+          <span
+            className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${
+              isActive ? "bg-bg-elevated" : "bg-bg-card"
+            }`}
+          >
+            <Icon size={14} className="text-text" />
+          </span>
+          <span
+            className={`flex-1 truncate text-[14px] ${
+              isActive ? "text-text" : "text-text-secondary"
+            }`}
+          >
+            {item.label}
+          </span>
+          <span className="flex items-center gap-1">
+            <Kbd>{item.shortcut[0]}</Kbd>
+            <Kbd>{item.shortcut[1]}</Kbd>
+          </span>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="font-mono text-[10px] leading-none rounded-sm border border-hairline bg-white/[0.04] px-1.5 py-1 text-white/50">
+    <kbd className="inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 rounded bg-bg-card text-[10.5px] font-mono text-text-tertiary leading-none">
       {children}
     </kbd>
   );
