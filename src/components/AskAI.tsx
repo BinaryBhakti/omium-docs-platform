@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  Sparkles,
   X,
   ArrowUp,
   RotateCcw,
@@ -144,7 +143,6 @@ export function AskAI({ open, onClose, pageContext }: Props) {
         {/* Header */}
         <div className="flex items-center justify-between h-14 px-4 bg-bg-elevated">
           <div className="flex items-center gap-2 min-w-0">
-            <Sparkles size={14} className="text-warm-solid shrink-0" />
             <span className="text-[14px] font-medium text-text">Ask AI</span>
             <span className="font-mono text-meta uppercase text-text-tertiary ml-1 truncate">
               page-aware
@@ -216,7 +214,6 @@ export function AskAI({ open, onClose, pageContext }: Props) {
                   ) : (
                     <div>
                       <div className="flex items-center gap-1.5 mb-1.5">
-                        <Sparkles size={11} className="text-warm-solid" />
                         <span className="font-mono text-meta uppercase text-text-tertiary">
                           Omium AI
                         </span>

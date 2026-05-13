@@ -2,16 +2,19 @@ import { DocLayout } from "../../components/DocLayout";
 import { CodeBlock } from "../../components/CodeBlock";
 import { Callout } from "../../components/Callout";
 import { Tabs } from "../../components/Tabs";
+import { MdxTable } from "../../components/MdxTable";
 import { DocCard, DocCardGrid } from "../../components/DocCard";
 import { Terminal, Webhook } from "lucide-react";
 
 const toc = [
   { id: "install", label: "Install", depth: 2 as const },
   { id: "init", label: "Initialize", depth: 2 as const },
+  { id: "config", label: "OmiumConfig reference", depth: 2 as const },
   { id: "auto", label: "Auto-instrumentation", depth: 2 as const },
   { id: "manual", label: "Manual tracing", depth: 2 as const },
-  { id: "config", label: "Configuration", depth: 2 as const },
-  { id: "errors", label: "Errors", depth: 2 as const },
+  { id: "callbacks", label: "LangChain callbacks", depth: 2 as const },
+  { id: "execution", label: "Execution-ID correlation", depth: 2 as const },
+  { id: "errors", label: "Error handling", depth: 2 as const },
   { id: "next", label: "Next steps", depth: 2 as const },
 ];
 
@@ -25,160 +28,305 @@ export function SdkPython() {
       ]}
       eyebrow="SDK and CLI"
       title="Python SDK"
-      description="Initialize Omium, instrument frameworks, and use advanced APIs."
+      description="Initialize Omium, instrument frameworks, and add manual tracing or checkpoints."
       toc={toc}
       complexity="intermediate"
-      etaMinutes={6}
+      etaMinutes={7}
       prev={{ label: "Billing", to: "/docs/api/billing" }}
       next={{ label: "CLI reference", to: "/docs/sdk/cli" }}
     >
-      <p>The Python SDK is the primary integration surface for Omium. Most teams:</p>
+      <p>
+        The Python SDK is the primary integration surface for Omium. In most
+        codebases you'll:
+      </p>
       <ul>
         <li>
-          use <strong>auto-instrumentation</strong> for LangGraph / CrewAI
+          call <code>omium.init()</code> once at process start
         </li>
         <li>
-          add <strong>manual tracing</strong> for custom steps that matter
+          let auto-instrumentation handle <strong>LangGraph</strong> and{" "}
+          <strong>CrewAI</strong>
         </li>
         <li>
-          rely on the <strong>CLI</strong> for day-two operations (list, logs,
-          replay)
+          decorate hot paths with <code>@omium.trace</code> and{" "}
+          <code>@omium.checkpoint</code> where you want stable span names or
+          recovery points
         </li>
       </ul>
-      <p>
-        If you haven't authenticated yet, do{" "}
-        <a href="/docs/getting-started/configure">Configure</a> first.
-      </p>
 
       <h2 id="install">Install</h2>
       <CodeBlock lang="bash" code={`pip install omium`} />
+      <p>
+        If you haven't authenticated yet, see{" "}
+        <a href="/docs/getting-started/configure">Configure</a>.
+      </p>
 
       <h2 id="init">Initialize</h2>
-      <p>You can initialize in two common ways.</p>
+      <p>
+        <code>omium.init()</code> is the single entry point. Call it once,
+        before your first traced call. The function is idempotent — calling
+        it again logs a warning and returns the existing config.
+      </p>
       <Tabs
         tabs={[
           {
-            title: "From CLI config (recommended)",
+            title: "From environment",
             content: (
               <>
                 <p style={{ padding: "0 12px" }}>
-                  Run <code>omium init</code> once, then:
+                  When <code>OMIUM_API_KEY</code> and <code>OMIUM_API_URL</code>{" "}
+                  are set in the process environment:
                 </p>
                 <CodeBlock
                   lang="python"
                   code={`import omium
 
-omium.init()`}
+omium.init(project="my-agent")`}
                 />
               </>
             ),
           },
           {
-            title: "From code / env",
+            title: "Inline kwargs",
             content: (
               <CodeBlock
                 lang="python"
                 code={`import omium
 
-omium.init(api_key="omium_xxx")  # or set OMIUM_API_KEY in the environment`}
+omium.init(
+    api_key="om_xxx",
+    project="my-agent",
+    debug=True,
+)`}
               />
             ),
           },
         ]}
       />
+      <Callout variant="note">
+        The SDK does not read the CLI's <code>~/.omium/config.json</code> file
+        directly. To run a script using credentials saved by{" "}
+        <code>omium init</code>, invoke it via <code>omium run script.py</code>{" "}
+        — the CLI exports the saved values into the child process.
+      </Callout>
+
+      <h3 id="signature">init() signature</h3>
+      <CodeBlock
+        lang="python"
+        code={`omium.init(
+    api_key: str | None = None,
+    project: str | None = None,
+    auto_trace: bool = True,
+    auto_checkpoint: bool = True,
+    checkpoint_strategy: str = "node",   # "node" | "task" | "agent" | "manual"
+    api_base_url: str | None = None,
+    debug: bool = False,
+) -> OmiumConfig`}
+      />
+
+      <h2 id="config">OmiumConfig reference</h2>
+      <p>
+        <code>omium.init()</code> returns an <code>OmiumConfig</code> instance.
+        Call <code>omium.configure(**kwargs)</code> to update fields after
+        initialization, or read the live config with{" "}
+        <code>omium.get_current_config()</code>.
+      </p>
+      <Callout variant="warn">
+        <code>configure()</code> takes keyword arguments, not an{" "}
+        <code>OmiumConfig</code> instance. Passing a dataclass to it will
+        silently no-op.
+      </Callout>
+      <CodeBlock
+        lang="python"
+        code={`import omium
+
+omium.init(api_key="om_xxx", project="my-agent")
+
+# Later — update one field:
+omium.configure(auto_checkpoint=False)
+
+# Inspect the active config:
+cfg = omium.get_current_config()
+print(cfg.project, cfg.auto_trace)`}
+      />
+      <h3 id="fields">Fields</h3>
+      <MdxTable
+        head={["Field", "Type", "Default", "Notes"]}
+        rows={[
+          [<code>api_key</code>, "str", "—", <span>Accepts <code>om_…</code> or <code>omium_…</code>.</span>],
+          [<code>project</code>, "str", <code>"default"</code>, "Groups traces in the dashboard."],
+          [<code>auto_trace</code>, "bool", <code>True</code>, "Patches LangGraph/CrewAI on init."],
+          [<code>auto_checkpoint</code>, "bool", <code>True</code>, "Persists state via @checkpoint."],
+          [
+            <code>checkpoint_strategy</code>,
+            <code>str</code>,
+            <code>"node"</code>,
+            <span>One of <code>node</code> / <code>task</code> / <code>agent</code> / <code>manual</code>.</span>,
+          ],
+          [
+            <code>api_base_url</code>,
+            "str",
+            <code>https://api.omium.ai/api/v1</code>,
+            <span>
+              SDK auto-appends <code>/api/v1</code> if you supply only the
+              base.
+            </span>,
+          ],
+          [<code>debug</code>, "bool", <code>False</code>, "Verbose SDK logging."],
+        ]}
+      />
 
       <h2 id="auto">Auto-instrumentation</h2>
+      <p>
+        With <code>auto_trace=True</code> (the default),{" "}
+        <code>omium.init()</code> detects installed frameworks and patches
+        their entry points. You can also call the instrumenters directly when
+        you need explicit control.
+      </p>
       <h3 id="langgraph">LangGraph</h3>
       <CodeBlock
         lang="python"
         code={`import omium
 
-omium.init()
-omium.instrument_langgraph()`}
+omium.init(project="my-graph")
+omium.instrument_langgraph()      # explicit form; init() also calls this
+
+# CompiledStateGraph.invoke / ainvoke / stream / astream are now traced.
+result = app.invoke({"input": "hello"})
+
+omium.uninstrument_langgraph()    # restore original methods (tests, A/B)`}
       />
       <p>
-        See the full guide at{" "}
-        <a href="/docs/build-with-omium/langgraph">LangGraph</a>.
+        Full guide:{" "}
+        <a href="/docs/build-with-omium/langgraph">LangGraph integration</a>.
       </p>
-
       <h3 id="crewai">CrewAI</h3>
       <CodeBlock
         lang="python"
         code={`import omium
 
-omium.init()
-omium.instrument_crewai()`}
+omium.init(project="my-crew")
+omium.instrument_crewai()
+
+# Crew.kickoff / kickoff_async / kickoff_for_each are now traced.
+result = crew.kickoff()
+
+omium.uninstrument_crewai()`}
       />
-      <p>
-        See the full guide at <a href="/docs/build-with-omium/crewai">CrewAI</a>.
-      </p>
 
       <h2 id="manual">Manual tracing</h2>
       <p>
-        Use manual tracing when you want stable step names, or when your code
-        doesn't run inside an auto-instrumented framework.
+        Reach for the decorators when auto-instrumentation isn't enough:
+        custom logic outside a framework, code paths you want pinned with a
+        stable span name, or expensive steps you want to resume from.
       </p>
-      <h3 id="trace">@trace</h3>
+      <h3 id="trace">@omium.trace</h3>
       <CodeBlock
         lang="python"
-        code={`import omium
-
-omium.init()
-
-@omium.trace("extract")
+        code={`@omium.trace(
+    name="extract",        # defaults to the function name
+    span_type="function",  # "function" | "tool" | "llm" | …
+    capture_input=True,
+    capture_output=True,
+    capture_errors=True,
+)
 def extract(payload: dict) -> dict:
     return {"ok": True, "payload": payload}`}
       />
-      <h3 id="checkpoint">@checkpoint</h3>
+      <p>
+        Works on both sync and async functions — the decorator detects which
+        one it's wrapping. Set <code>capture_input=False</code> on functions
+        that take secrets or large blobs you don't want stored.
+      </p>
+      <h3 id="checkpoint">@omium.checkpoint</h3>
+      <CodeBlock
+        lang="python"
+        code={`@omium.checkpoint(
+    name="after_extract",
+    capture_state=True,
+    on_error="skip",   # "skip" | "raise" | "log"
+)
+def expensive_step(state: dict) -> dict:
+    return state`}
+      />
+      <MdxTable
+        head={["on_error", "Behaviour when checkpoint write fails"]}
+        rows={[
+          [<code>"skip"</code>, "Silently continue execution (default)."],
+          [<code>"log"</code>, "Emit a warning and continue."],
+          [<code>"raise"</code>, "Propagate the exception."],
+        ]}
+      />
+
+      <h2 id="callbacks">LangChain callbacks</h2>
+      <p>
+        Use <code>OmiumCallbackHandler</code> for LangChain chains and
+        Runnables that aren't covered by the LangGraph patcher.
+      </p>
+      <CodeBlock
+        lang="python"
+        code={`from omium import OmiumCallbackHandler
+
+handler = OmiumCallbackHandler()
+chain.invoke(input, config={"callbacks": [handler]})`}
+      />
+
+      <h2 id="execution">Execution-ID correlation</h2>
+      <p>
+        When a run is started through the Execution Engine (REST API,
+        webhook, or another service), correlate Python-side traces with the
+        engine's <code>execution_id</code> by setting it explicitly:
+      </p>
       <CodeBlock
         lang="python"
         code={`import omium
 
-omium.init()
+omium.init(api_key="om_xxx")
+omium.set_execution_id("exec_abc123")
 
-@omium.checkpoint("after_extract")
-def expensive_step(state: dict) -> dict:
-    return state`}
+# Subsequent spans, including LangGraph/CrewAI patches, use this ID.
+graph.invoke({"input": "hello"})
+
+print(omium.get_execution_id())  # -> "exec_abc123"`}
       />
 
-      <h2 id="config">Configuration</h2>
-      <p>Most teams start with defaults. When you want explicit control:</p>
+      <h2 id="errors">Error handling</h2>
+      <p>
+        Omium aims to never break your code. If trace ingestion or checkpoint
+        writes fail, the SDK logs a warning and lets your program continue.
+        For explicit error handling against the checkpoint manager directly,
+        the legacy client surface raises typed exceptions:
+      </p>
       <CodeBlock
         lang="python"
-        code={`from omium import OmiumConfig
-import omium
+        code={`from omium import (
+    OmiumClient,
+    CheckpointError,
+    CheckpointNotFoundError,
+    CheckpointValidationError,
+)
 
-omium.configure(
-    OmiumConfig(
-        api_key="omium_xxx",
-        api_url="https://api.omium.ai",
-        project="my-agent",
-        auto_trace=True,
-        auto_checkpoint=True,
-    )
-)`}
+try:
+    client = OmiumClient(checkpoint_manager_url="localhost:7001")
+    await client.connect()
+    await client.load_checkpoint("does_not_exist")
+except CheckpointNotFoundError:
+    ...
+except CheckpointValidationError:
+    ...
+except CheckpointError:
+    ...`}
       />
-      <Callout variant="tip">
-        For the hosted platform, set <code>api_url</code> to{" "}
-        <code>https://api.omium.ai</code> in SDK config and to{" "}
-        <code>https://api.omium.ai</code> (no <code>/api/v1</code>) in CLI
-        config. The SDK/CLI add <code>/api/v1</code> where needed.
-      </Callout>
-
-      <h2 id="errors">Errors</h2>
       <p>
-        If you want to catch Omium-specific failures (for example, checkpoint
-        lookups), import the relevant exception classes from <code>omium</code>{" "}
-        and handle them at your boundary (HTTP handler, queue worker, etc.).
-        Keep retries and fallbacks at the edge of your system, not inside step
-        functions.
+        Keep retries and fallbacks at the boundary of your system (HTTP
+        handler, queue worker) rather than inside step functions.
       </p>
 
       <h2 id="next">Next steps</h2>
       <DocCardGrid>
         <DocCard
           title="CLI reference"
-          description="Configure, run, list executions, stream logs, and replay."
+          description="Authenticate, run scripts, inspect traces, replay failures, push projects."
           to="/docs/sdk/cli"
           icon={Terminal}
         />

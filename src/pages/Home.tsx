@@ -3,7 +3,6 @@ import {
   Rocket,
   Network,
   Users,
-  Webhook,
   Download,
   KeyRound,
   FolderOpen,
@@ -30,12 +29,6 @@ const popular = [
     description: "Automatic tracing and checkpoints for CrewAI crews.",
     to: "/docs/build-with-omium/crewai",
     icon: Users,
-  },
-  {
-    title: "REST API",
-    description: "Base URL, authentication, available resources, and your first request.",
-    to: "/docs/api/overview",
-    icon: Webhook,
   },
 ];
 
@@ -81,12 +74,6 @@ const omiumBasics = [
     description: "How tracing, checkpoints, workflows, and the dashboard fit together.",
     to: "/docs/build-with-omium/overview",
     icon: LayoutDashboard,
-  },
-  {
-    title: "API overview",
-    description: "Base URL, authentication, available resources, and your first request.",
-    to: "/docs/api/overview",
-    icon: Webhook,
   },
 ];
 
