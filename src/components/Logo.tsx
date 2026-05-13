@@ -9,7 +9,7 @@ type Props = {
 export function Logo({
   height = 26,
   withDocsBadge = true,
-  variant = "wordmark",
+  variant = "mark",
 }: Props) {
   const src =
     variant === "mark" ? "/logos/mark.svg" : "/logos/wordmark.svg";
@@ -30,16 +30,18 @@ export function Logo({
         className="block"
         style={{ height, width: w }}
       />
-      {withDocsBadge && variant === "wordmark" && (
+      {withDocsBadge && (
         <>
           <span
-            className="text-text-quaternary text-[14px] leading-none select-none"
             aria-hidden
+            className="inline-block w-px bg-[color:var(--color-border-structural)]"
+            style={{ height: Math.round(height * 0.65) }}
+          />
+          <span
+            className="text-[14px] font-medium text-text-secondary tracking-tight leading-none"
+            style={{ transform: "translateY(-0.5px)" }}
           >
-            /
-          </span>
-          <span className="text-[14px] font-medium text-text-secondary tracking-tight">
-            docs
+            Docs
           </span>
         </>
       )}

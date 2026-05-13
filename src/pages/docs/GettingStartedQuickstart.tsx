@@ -1,14 +1,16 @@
 import { DocLayout } from "../../components/DocLayout";
 import { CodeBlock } from "../../components/CodeBlock";
 import { DocCard, DocCardGrid } from "../../components/DocCard";
+import { Callout } from "../../components/Callout";
 import { Network, Users, FolderOpen, Terminal } from "lucide-react";
 
 const toc = [
   { id: "prereq", label: "Prerequisites", depth: 2 as const },
   { id: "install", label: "Step 1: Install", depth: 2 as const },
   { id: "auth", label: "Step 2: Authenticate", depth: 2 as const },
-  { id: "script", label: "Step 3: Run a traced script", depth: 2 as const },
-  { id: "dashboard", label: "Step 4: See it in the dashboard", depth: 2 as const },
+  { id: "script", label: "Step 3: Write a traced script", depth: 2 as const },
+  { id: "run", label: "Step 4: Run it", depth: 2 as const },
+  { id: "dashboard", label: "Step 5: See it in the dashboard", depth: 2 as const },
   { id: "next", label: "What's next", depth: 2 as const },
 ];
 
@@ -33,14 +35,15 @@ export function GettingStartedQuickstart() {
       }}
     >
       <p>
-        This tutorial gets you from "installed" to a real execution showing up
-        in the dashboard.
+        This walk-through gets you from a clean machine to a real execution
+        showing up in the Omium dashboard.
       </p>
 
       <h2 id="prereq">Prerequisites</h2>
       <ul>
         <li>
-          <a href="/docs/getting-started/installation">Install Omium</a>
+          <a href="/docs/getting-started/installation">Omium installed</a>{" "}
+          (Python 3.9+)
         </li>
         <li>
           An API key from{" "}
@@ -54,71 +57,110 @@ export function GettingStartedQuickstart() {
       <CodeBlock lang="bash" code={`pip install omium`} />
 
       <h2 id="auth">Step 2: Authenticate</h2>
-      <p>If you're on a laptop, the fastest setup is:</p>
+      <p>
+        Pick whichever path matches your environment. <em>Either</em>{" "}
+        approach is sufficient — you don't need both.
+      </p>
+      <p>
+        <strong>Workstation:</strong> save credentials via the CLI wizard:
+      </p>
       <CodeBlock lang="bash" code={`omium init`} />
-      <p>If you prefer environment variables:</p>
+      <p>
+        <strong>CI / Docker / scripted:</strong> use environment variables:
+      </p>
       <CodeBlock
         lang="bash"
-        code={`export OMIUM_API_KEY=omium_your_key_here
+        code={`export OMIUM_API_KEY=om_your_key_here
 export OMIUM_API_URL=https://api.omium.ai`}
       />
+      <Callout variant="note">
+        The Python SDK reads <code>OMIUM_API_KEY</code> / <code>OMIUM_API_URL</code>{" "}
+        from the environment, not from the CLI's config file. To make the
+        CLI's saved key available to <code>python script.py</code>, run via{" "}
+        <code>omium run script.py</code> instead — the CLI will inject the
+        credentials for you.
+      </Callout>
 
-      <h2 id="script">Step 3: Run a minimal traced script</h2>
+      <h2 id="script">Step 3: Write a traced script</h2>
       <p>
-        Create a file named <code>quickstart.py</code>:
+        Create a file called <code>quickstart.py</code>:
       </p>
       <CodeBlock
         lang="python"
         filename="quickstart.py"
         code={`import omium
 
-omium.init()  # reads ~/.omium/config.json or OMIUM_API_KEY/OMIUM_API_URL
+# Reads OMIUM_API_KEY / OMIUM_API_URL from the environment.
+# (Or pass api_key="om_xxx" explicitly.)
+omium.init(project="quickstart")
 
-@omium.trace("hello")
-def hello(name: str) -> str:
+
+@omium.trace("greet")
+def greet(name: str) -> str:
     return f"hello, {name}"
 
+
 if __name__ == "__main__":
-    print(hello("omium"))`}
+    print(greet("omium"))`}
       />
-      <p>Run it:</p>
-      <CodeBlock lang="bash" code={`python quickstart.py`} />
+      <p>
+        The <code>@omium.trace</code> decorator creates a span around the
+        function. Auto-instrumentation also wires up LangGraph and CrewAI
+        if those packages are importable at <code>init()</code> time.
+      </p>
+
+      <h2 id="run">Step 4: Run it</h2>
+      <p>Pick whichever invocation matches how you authenticated in Step 2:</p>
+      <CodeBlock
+        lang="bash"
+        code={`# Env vars set, or api_key passed inline:
+python quickstart.py
+
+# Or, let the CLI inject your saved credentials:
+omium run quickstart.py --project quickstart`}
+      />
       <p>Expected output:</p>
       <CodeBlock lang="bash" code={`hello, omium`} />
 
-      <h2 id="dashboard">Step 4: See it in the dashboard</h2>
+      <h2 id="dashboard">Step 5: See it in the dashboard</h2>
       <p>
         Open{" "}
         <a href="https://app.omium.ai" target="_blank" rel="noreferrer">
           app.omium.ai
-        </a>{" "}
-        and look for the execution under:
+        </a>
+        . The run should appear within a few seconds under:
       </p>
       <ul>
         <li>
-          <strong>Executions</strong>
+          <strong>Traces</strong> — every <code>@omium.trace</code> span
         </li>
         <li>
-          or your project area in <strong>Automations</strong> (once you start
-          pushing projects)
+          <strong>Automations</strong> → the <code>quickstart</code> project
+          once you push a project (see <em>First project</em> below)
         </li>
       </ul>
-      <p>If you don't see it after a minute:</p>
+      <p>If nothing appears after a minute:</p>
       <ul>
         <li>
-          confirm your key is valid (<code>omium init</code> again)
+          Confirm the key is valid with <code>omium init</code> (or echo{" "}
+          <code>OMIUM_API_KEY</code>)
         </li>
         <li>
-          confirm your API URL is <code>https://api.omium.ai</code>
+          Confirm <code>OMIUM_API_URL</code> is{" "}
+          <code>https://api.omium.ai</code> — not the staging URL or a stale
+          tunnel
         </li>
-        <li>check network access from your machine</li>
+        <li>
+          Re-run with <code>OMIUM_DEBUG=true</code> to surface SDK-side
+          errors
+        </li>
       </ul>
 
       <h2 id="next">What's next</h2>
       <DocCardGrid>
         <DocCard
           title="LangGraph"
-          description="Auto-instrument LangGraph calls like invoke() and stream()."
+          description="Auto-instrument invoke(), ainvoke(), stream(), and astream()."
           to="/docs/build-with-omium/langgraph"
           icon={Network}
         />
@@ -130,13 +172,13 @@ if __name__ == "__main__":
         />
         <DocCard
           title="First project"
-          description="Push a project so it appears as an Automation in the app."
+          description="Push a project so it shows up under Automations in the app."
           to="/docs/getting-started/first-project"
           icon={FolderOpen}
         />
         <DocCard
           title="CLI reference"
-          description="Inspect executions, stream logs, replay, and more."
+          description="Inspect traces, replay failures, push projects, and more."
           to="/docs/sdk/cli"
           icon={Terminal}
         />

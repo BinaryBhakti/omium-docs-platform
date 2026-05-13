@@ -38,15 +38,20 @@ export function BuildCrewAI() {
       </p>
 
       <h2 id="quickstart">Quickstart</h2>
-      <p>Install dependencies:</p>
+      <p>Install both packages:</p>
       <CodeBlock lang="bash" code={`pip install omium crewai`} />
-      <p>Enable CrewAI instrumentation once at startup:</p>
+      <p>
+        Initialise Omium once at startup. <code>omium.init()</code>{" "}
+        auto-detects CrewAI and patches <code>Crew.kickoff()</code> for you
+        when <code>auto_trace=True</code> (the default). Calling{" "}
+        <code>instrument_crewai()</code> explicitly is safe and idempotent.
+      </p>
       <CodeBlock
         lang="python"
         code={`import omium
 
-omium.init()
-omium.instrument_crewai()`}
+omium.init(project="my-crew")
+omium.instrument_crewai()  # optional — init() already did this`}
       />
       <p>Run your crew normally:</p>
       <CodeBlock
@@ -117,21 +122,25 @@ results = crew.kickoff_for_each(inputs)`}
       />
 
       <h2 id="config">Configuration</h2>
+      <p>
+        Pass options to <code>omium.init()</code>. Use{" "}
+        <code>checkpoint_strategy="task"</code> if you want a checkpoint after
+        every CrewAI task rather than every node:
+      </p>
       <CodeBlock
         lang="python"
         code={`import omium
-from omium import OmiumConfig
 
-omium.configure(
-    OmiumConfig(
-        api_key="omium_xxx",
-        project="my-crewai-app",
-        auto_trace=True,
-        auto_checkpoint=True,
-    )
+omium.init(
+    api_key="om_xxx",
+    project="my-crewai-app",
+    auto_trace=True,
+    auto_checkpoint=True,
+    checkpoint_strategy="task",
 )
 
-omium.instrument_crewai()`}
+# Update fields later (keyword args, not an OmiumConfig instance):
+omium.configure(auto_checkpoint=False)`}
       />
 
       <h2 id="troubleshoot">Troubleshooting</h2>

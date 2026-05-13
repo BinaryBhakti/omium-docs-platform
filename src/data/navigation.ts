@@ -26,18 +26,6 @@ export const navigation: NavSection[] = [
     ],
   },
   {
-    title: "REST API",
-    items: [
-      { label: "API overview", to: "/docs/api/overview" },
-      { label: "API errors and rate limits", to: "/docs/api/errors-and-rate-limits" },
-      { label: "Executions", to: "/docs/api/executions" },
-      { label: "Checkpoints", to: "/docs/api/checkpoints" },
-      { label: "Workflows", to: "/docs/api/workflows" },
-      { label: "Failures", to: "/docs/api/failures" },
-      { label: "Billing", to: "/docs/api/billing" },
-    ],
-  },
-  {
     title: "SDK and CLI",
     items: [
       { label: "Python SDK", to: "/docs/sdk/python-sdk" },

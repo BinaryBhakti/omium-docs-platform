@@ -36,23 +36,30 @@ export function BuildLangGraph() {
       next={{ label: "CrewAI", to: "/docs/build-with-omium/crewai" }}
     >
       <Callout variant="note">
-        Omium instruments LangGraph at runtime. Once enabled, your calls to{" "}
-        <code>invoke()</code>, <code>ainvoke()</code>, <code>stream()</code>,
-        and <code>astream()</code> are traced without rewriting your graph.
+        Omium patches <code>CompiledStateGraph</code> at runtime. Once
+        enabled, every call to <code>invoke()</code>, <code>ainvoke()</code>,{" "}
+        <code>stream()</code>, and <code>astream()</code> is traced without
+        touching your graph definition.
       </Callout>
 
       <h2 id="quickstart">Quickstart</h2>
-      <p>Install dependencies:</p>
+      <p>Install both packages:</p>
       <CodeBlock lang="bash" code={`pip install omium langgraph`} />
       <p>
-        Then initialize Omium and enable LangGraph instrumentation once at
-        startup:
+        Initialise Omium once at process start. With{" "}
+        <code>auto_trace=True</code> (the default), <code>omium.init()</code>{" "}
+        detects LangGraph and calls <code>instrument_langgraph()</code> for
+        you. Calling it explicitly is fine too — it's idempotent.
       </p>
       <CodeBlock
         lang="python"
         code={`import omium
 
-omium.init()  # uses ~/.omium/config.json or OMIUM_API_KEY / OMIUM_API_URL
+# Reads OMIUM_API_KEY / OMIUM_API_URL from the environment, or pass
+# api_key="om_xxx" inline.
+omium.init(project="my-graph")
+
+# Optional — init() already did this if LangGraph was importable:
 omium.instrument_langgraph()`}
       />
       <p>Your graph code runs unchanged:</p>
@@ -146,24 +153,23 @@ for chunk in app.stream({"input": "Hello"}):
 
       <h2 id="config">Configuration</h2>
       <p>
-        Most teams start with <code>omium init</code> and defaults. For
-        explicit configuration:
+        Pass settings directly to <code>omium.init()</code>, or update fields
+        afterward with <code>omium.configure(**kwargs)</code>:
       </p>
       <CodeBlock
         lang="python"
         code={`import omium
-from omium import OmiumConfig
 
-omium.configure(
-    OmiumConfig(
-        api_key="omium_xxx",
-        project="my-langgraph-app",
-        auto_trace=True,
-        auto_checkpoint=True,
-    )
+omium.init(
+    api_key="om_xxx",
+    project="my-langgraph-app",
+    auto_trace=True,
+    auto_checkpoint=True,
+    checkpoint_strategy="node",   # "node" | "task" | "agent" | "manual"
 )
 
-omium.instrument_langgraph()`}
+# Update specific fields later (keyword args, not an OmiumConfig instance):
+omium.configure(auto_checkpoint=False)`}
       />
 
       <h2 id="troubleshoot">Troubleshooting</h2>

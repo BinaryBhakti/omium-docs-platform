@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { navigation } from "../data/navigation";
-import { X, Sparkles, ChevronDown } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 
 type Props = {
   open: boolean;
@@ -154,30 +154,6 @@ export function Sidebar({ open, onClose }: Props) {
             );
           })}
 
-          <div className="mt-6 mx-1 card-surface relative overflow-hidden p-3.5">
-            <div
-              className="absolute -right-12 -top-12 h-32 w-32 rounded-full opacity-60 pointer-events-none"
-              style={{
-                background:
-                  "radial-gradient(closest-side, var(--color-warm-halftone), transparent 70%)",
-              }}
-              aria-hidden
-            />
-            <div className="relative">
-              <div className="flex items-center gap-1.5">
-                <Sparkles size={11} className="text-text-secondary" />
-                <span className="font-mono text-meta uppercase text-text-tertiary">
-                  What's new
-                </span>
-              </div>
-              <p className="mt-2 text-[12.5px] leading-[18px] text-text-secondary">
-                Trace API v1.2 ships token-cost attribution per span.
-              </p>
-              <a className="mt-2.5 inline-flex items-center text-[12px] text-text hover:text-text/80 cursor-pointer transition-colors">
-                Read changelog →
-              </a>
-            </div>
-          </div>
         </nav>
       </aside>
     </>
